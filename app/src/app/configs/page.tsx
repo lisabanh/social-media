@@ -6,6 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -30,6 +37,7 @@ export default function ConfigsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Config | null>(null);
   const [form, setForm] = useState(emptyConfig);
+  const [saveError, setSaveError] = useState("");
 
   const loadConfigs = () => {
     fetch("/api/configs").then((r) => r.json()).then(setConfigs);
@@ -44,6 +52,7 @@ export default function ConfigsPage() {
   const openNew = () => {
     setEditing(null);
     setForm(emptyConfig);
+    setSaveError("");
     setDialogOpen(true);
   };
 
@@ -55,23 +64,31 @@ export default function ConfigsPage() {
       analysisInstruction: config.analysisInstruction,
       newConceptsInstruction: config.newConceptsInstruction,
     });
+    setSaveError("");
     setDialogOpen(true);
   };
 
   const handleSave = async () => {
-    if (editing) {
-      await fetch("/api/configs", {
+    setSaveError("");
+
+    const response = editing
+      ? await fetch("/api/configs", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editing.id, ...form }),
-      });
-    } else {
-      await fetch("/api/configs", {
+      })
+      : await fetch("/api/configs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({ error: "Failed to save config" }));
+      setSaveError(data.error || "Failed to save config");
+      return;
     }
+
     setDialogOpen(false);
     loadConfigs();
   };
@@ -81,6 +98,9 @@ export default function ConfigsPage() {
     await fetch(`/api/configs?id=${id}`, { method: "DELETE" });
     loadConfigs();
   };
+
+  const creatorCategories = [...new Set(creators.map((creator) => creator.category).filter(Boolean))].sort();
+  const isSaveDisabled = !form.configName.trim() || !form.creatorsCategory;
 
   return (
     <div className="space-y-8">
@@ -114,13 +134,28 @@ export default function ConfigsPage() {
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">Creators Category</Label>
-                <Input
+                <Select
                   value={form.creatorsCategory}
-                  onChange={(e) => setForm({ ...form, creatorsCategory: e.target.value })}
-                  placeholder="e.g. dubai-real-estate"
-                  className="mt-1.5 rounded-xl glass border-white/[0.08] h-11"
-                />
+                  onValueChange={(value) => {
+                    setForm({ ...form, creatorsCategory: value });
+                    setSaveError("");
+                  }}
+                >
+                  <SelectTrigger className="mt-1.5 rounded-xl glass border-white/[0.08] h-11">
+                    <SelectValue placeholder="Select an existing category..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {creatorCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+              {saveError && (
+                <p className="text-xs text-red-400">{saveError}</p>
+              )}
               <div>
                 <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
                   <Search className="h-3 w-3 text-purple-400" />
@@ -149,6 +184,7 @@ export default function ConfigsPage() {
               </div>
               <Button
                 onClick={handleSave}
+                disabled={isSaveDisabled}
                 className="w-full rounded-xl h-11 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 border-0"
               >
                 {editing ? "Save Changes" : "Create Config"}
