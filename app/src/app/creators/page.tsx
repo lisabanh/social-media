@@ -188,7 +188,7 @@ export default function CreatorsPage() {
                 Add Creator
               </Button>
             </DialogTrigger>
-            <DialogContent className="glass-strong rounded-2xl border-white/[0.08]">
+            <DialogContent className="rounded-2xl border-border bg-card shadow-xl">
               <DialogHeader>
                 <DialogTitle>{editing ? "Edit Creator" : "Add Creator"}</DialogTitle>
               </DialogHeader>

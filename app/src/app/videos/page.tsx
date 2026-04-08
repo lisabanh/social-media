@@ -249,7 +249,7 @@ function VideosContent() {
 
       {/* Analysis / Concepts Modal */}
       <Dialog open={!!modalVideo} onOpenChange={(open) => { if (!open) setModalVideo(null); }}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden glass-strong rounded-2xl border-white/[0.08] p-0 gap-0">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl border-border bg-card shadow-xl p-0 gap-0">
           <DialogTitle className="sr-only">
             {modalSection === "analysis" ? "Video Analysis" : "New Concepts"}
           </DialogTitle>

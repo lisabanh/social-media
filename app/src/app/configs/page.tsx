@@ -118,7 +118,7 @@ export default function ConfigsPage() {
               New Config
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto glass-strong rounded-2xl border-white/[0.08]">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border-border bg-card shadow-xl">
             <DialogHeader>
               <DialogTitle>{editing ? "Edit Config" : "New Config"}</DialogTitle>
             </DialogHeader>
