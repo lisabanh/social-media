@@ -51,7 +51,7 @@ export async function scrapeReels(
         isUserTaggedFeedURL: false,
         onlyPostsNewerThan: sinceDate,
         resultsLimit: maxVideos,
-        resultsType: "stories",
+        resultsType: "reels",
       }),
     }
   );
@@ -104,7 +104,7 @@ export async function scrapeCreatorStats(username: string): Promise<CreatorStats
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         directUrls: [`https://www.instagram.com/${username}/`],
-        resultsType: "stories",
+        resultsType: "reels",
         resultsLimit: 100,
         onlyPostsNewerThan: sinceDate,
         addParentData: false,
